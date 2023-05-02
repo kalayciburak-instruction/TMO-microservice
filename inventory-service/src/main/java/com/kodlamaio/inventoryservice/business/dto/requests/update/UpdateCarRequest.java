@@ -2,7 +2,8 @@ package com.kodlamaio.inventoryservice.business.dto.requests.update;
 
 import com.kodlamaio.inventoryservice.entities.enums.State;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,15 +16,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateCarRequest {
-    @NotEmpty
+    @NotNull
     private UUID modelId;
     @Min(2015)
     // TODO: NotFuture custom annotation
     private int modelYear;
     // TODO: add regex
-    @NotEmpty
+    @NotBlank
     private String plate;
-    @NotEmpty
+    @NotNull
     private State state;
     @Min(value = 1)
     private double dailyPrice;
