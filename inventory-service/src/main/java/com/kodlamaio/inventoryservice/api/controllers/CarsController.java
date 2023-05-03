@@ -9,6 +9,7 @@ import com.kodlamaio.inventoryservice.business.dto.responses.get.GetCarResponse;
 import com.kodlamaio.inventoryservice.business.dto.responses.update.UpdateCarResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class CarsController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public CreateCarResponse add(@Valid @RequestBody CreateCarRequest request) {
         return service.add(request);
     }
@@ -41,6 +43,7 @@ public class CarsController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         service.delete(id);
     }
