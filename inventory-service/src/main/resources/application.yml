@@ -1,8 +1,10 @@
 spring:
+  application:
+    name: inventory-service
   datasource:
     username: postgres
     password: '12345'
-    url: jdbc:postgresql://localhost:5432/tmo-inventorydb-dev
+    url: jdbc:postgresql://localhost:5432/inventorydb-dev
   jpa:
     properties:
       hibernate:
@@ -10,3 +12,19 @@ spring:
         show_sql: true
     hibernate:
       ddl-auto: update
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:9000/eureka
+  instance:
+    instance-id: ${spring.application.name}:${instanceId:${random.value}}
+    preferIpAddress: true
+server:
+  port: 0
