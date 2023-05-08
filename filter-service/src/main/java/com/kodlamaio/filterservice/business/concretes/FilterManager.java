@@ -70,7 +70,7 @@ public class FilterManager implements FilterService {
 
     @Override
     public void deleteAllByBrandId(UUID brandId) {
-
+        repository.deleteAllByBrandId(brandId);
     }
 
     @Override

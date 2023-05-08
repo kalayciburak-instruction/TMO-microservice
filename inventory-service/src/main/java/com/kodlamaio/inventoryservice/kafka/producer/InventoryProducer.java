@@ -1,5 +1,6 @@
 package com.kodlamaio.inventoryservice.kafka.producer;
 
+import com.kodlamaio.commonpackage.events.Event;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ public class InventoryProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private static Logger LOGGER = LoggerFactory.getLogger(InventoryProducer.class);
 
-    public <T> void sendMessage(T event, String topic) {
+    public <T extends Event> void sendMessage(T event, String topic) {
         LOGGER.info(String.format("Event => %s", event.toString()));
 
         Message<T> message = MessageBuilder

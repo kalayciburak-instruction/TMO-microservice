@@ -1,21 +1,16 @@
 spring:
   application:
-    name: inventory-service
+    name: rental-service
   datasource:
     username: postgres
     password: '12345'
-    url: jdbc:postgresql://localhost:5432/inventorydb-dev
+    url: jdbc:postgresql://localhost:5432/rentaldb-dev
   jpa:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-  kafka:
-    producer:
-      bootstrap-servers: http://192.168.4.24:9092
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 eureka:
   client:
     fetch-registry: true
