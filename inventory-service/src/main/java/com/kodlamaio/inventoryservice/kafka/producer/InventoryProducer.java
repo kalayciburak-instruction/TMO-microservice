@@ -1,6 +1,5 @@
 package com.kodlamaio.inventoryservice.kafka.producer;
 
-import com.kodlamaio.commonpackage.events.Inventory.CarCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +15,13 @@ public class InventoryProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private static Logger LOGGER = LoggerFactory.getLogger(InventoryProducer.class);
 
-    public void sendMessage(CarCreatedEvent event) {
-        LOGGER.info(String.format("Car created event => %s", event.toString()));
+    public <T> void sendMessage(T event, String topic) {
+        LOGGER.info(String.format("Event => %s", event.toString()));
 
-        Message<CarCreatedEvent> message = MessageBuilder
+        Message<T> message = MessageBuilder
                 .withPayload(event)
-                .setHeader(KafkaHeaders.TOPIC, "car-created").build();
+                .setHeader(KafkaHeaders.TOPIC, topic)
+                .build();
 
         kafkaTemplate.send(message);
     }

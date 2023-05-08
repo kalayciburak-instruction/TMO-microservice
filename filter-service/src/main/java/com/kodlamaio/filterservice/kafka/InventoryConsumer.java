@@ -1,6 +1,7 @@
 package com.kodlamaio.filterservice.kafka;
 
 import com.kodlamaio.commonpackage.events.Inventory.CarCreatedEvent;
+import com.kodlamaio.commonpackage.events.Inventory.CarDeletedEvent;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.filterservice.business.abstracts.FilterService;
 import com.kodlamaio.filterservice.entities.Filter;
@@ -26,6 +27,15 @@ public class InventoryConsumer {
         var filter = mapper.forRequest().map(event, Filter.class);
         service.save(filter);
         LOGGER.info("Car created event consumed {}", event);
+    }
+
+    @KafkaListener(
+            topics = "car-deleted",
+            groupId = "car-delete"
+    )
+    public void consume(CarDeletedEvent event) {
+        service.deleteByCarId(event.getCarId());
+        LOGGER.info("Car deleted event consumed {}", event);
     }
 
 }
