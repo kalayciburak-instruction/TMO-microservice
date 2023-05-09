@@ -10,6 +10,4 @@ import java.util.UUID;
 public interface CarClient {
     @GetMapping(value = "/api/cars/check-car-available/{carId}")
     void checkIfCarAvailable(@PathVariable UUID carId);
-
-    
 }
