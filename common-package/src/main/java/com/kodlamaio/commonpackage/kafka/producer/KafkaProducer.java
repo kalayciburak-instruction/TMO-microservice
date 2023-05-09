@@ -1,23 +1,22 @@
-package com.kodlamaio.inventoryservice.kafka.producer;
+package com.kodlamaio.commonpackage.kafka.producer;
 
 import com.kodlamaio.commonpackage.events.Event;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class InventoryProducer {
+public class KafkaProducer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private static Logger LOGGER = LoggerFactory.getLogger(InventoryProducer.class);
 
     public <T extends Event> void sendMessage(T event, String topic) {
-        LOGGER.info(String.format("Event => %s", event.toString()));
+        log.info(String.format("Event => %s", event.toString()));
 
         Message<T> message = MessageBuilder
                 .withPayload(event)

@@ -39,7 +39,7 @@ public class FilterManager implements FilterService {
 
     @Override
     public Filter getByCarId(UUID carId) {
-        return null;
+        return repository.findByCarId(carId);
     }
 
     @Override
@@ -54,7 +54,6 @@ public class FilterManager implements FilterService {
 
     @Override
     public void save(Filter filter) {
-        filter.setId(UUID.randomUUID());
         repository.save(filter);
     }
 

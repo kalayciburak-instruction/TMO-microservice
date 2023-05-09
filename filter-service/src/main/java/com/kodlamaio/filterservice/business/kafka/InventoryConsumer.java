@@ -1,4 +1,4 @@
-package com.kodlamaio.filterservice.kafka;
+package com.kodlamaio.filterservice.business.kafka;
 
 import com.kodlamaio.commonpackage.events.Inventory.BrandDeletedEvent;
 import com.kodlamaio.commonpackage.events.Inventory.CarCreatedEvent;
@@ -7,16 +7,14 @@ import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.filterservice.business.abstracts.FilterService;
 import com.kodlamaio.filterservice.entities.Filter;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InventoryConsumer {
-    private static Logger LOGGER = LoggerFactory.getLogger(InventoryConsumer.class);
-
     private final FilterService service;
     private final ModelMapperService mapper;
 
@@ -27,7 +25,7 @@ public class InventoryConsumer {
     public void consume(CarCreatedEvent event) {
         var filter = mapper.forRequest().map(event, Filter.class);
         service.save(filter);
-        LOGGER.info("Car created event consumed {}", event);
+        log.info("Car created event consumed {}", event);
     }
 
     @KafkaListener(
@@ -36,7 +34,7 @@ public class InventoryConsumer {
     )
     public void consume(CarDeletedEvent event) {
         service.deleteByCarId(event.getCarId());
-        LOGGER.info("Car deleted event consumed {}", event);
+        log.info("Car deleted event consumed {}", event);
     }
 
     @KafkaListener(
@@ -45,7 +43,7 @@ public class InventoryConsumer {
     )
     public void consume(BrandDeletedEvent event) {
         service.deleteAllByBrandId(event.getBrandId());
-        LOGGER.info("Brand deleted event consumed {}", event);
+        log.info("Brand deleted event consumed {}", event);
     }
 
 }

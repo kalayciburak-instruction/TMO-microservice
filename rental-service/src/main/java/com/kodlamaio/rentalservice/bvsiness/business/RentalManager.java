@@ -1,6 +1,10 @@
 package com.kodlamaio.rentalservice.bvsiness.business;
 
+import com.kodlamaio.commonpackage.events.rental.RentalCreatedEvent;
+import com.kodlamaio.commonpackage.events.rental.RentalDeletedEvent;
+import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
+import com.kodlamaio.rentalservice.api.client.CarClient;
 import com.kodlamaio.rentalservice.bvsiness.abstracts.RentalService;
 import com.kodlamaio.rentalservice.bvsiness.dto.requests.CreateRentalRequest;
 import com.kodlamaio.rentalservice.bvsiness.dto.requests.UpdateRentalRequest;
@@ -24,6 +28,8 @@ public class RentalManager implements RentalService {
     private final RentalRepository repository;
     private final ModelMapperService mapper;
     private final RentalBusinessrules rules;
+    private final CarClient client;
+    private final KafkaProducer producer;
 
     @Override
     public List<GetAllRentalsResponse> getAll() {
@@ -47,11 +53,13 @@ public class RentalManager implements RentalService {
 
     @Override
     public CreateRentalResponse add(CreateRentalRequest request) {
+        client.checkIfCarAvailable(request.getCarId());
         var rental = mapper.forRequest().map(request, Rental.class);
         rental.setId(null);
         rental.setTotalPrice(getTotalPrice(rental));
         rental.setRentedAt(LocalDate.now());
         repository.save(rental);
+        sendKafkaRentalCreatedEvent(request.getCarId());
         var response = mapper.forResponse().map(rental, CreateRentalResponse.class);
 
         return response;
@@ -72,10 +80,20 @@ public class RentalManager implements RentalService {
     @Override
     public void delete(UUID id) {
         rules.checkIfRentalExists(id);
+        sendKafkaRentalDeletedEvent(id);
         repository.deleteById(id);
     }
 
     private double getTotalPrice(Rental rental) {
         return rental.getDailyPrice() * rental.getRentedForDays();
+    }
+
+    private void sendKafkaRentalCreatedEvent(UUID carId) {
+        producer.sendMessage(new RentalCreatedEvent(carId), "rental-created");
+    }
+
+    private void sendKafkaRentalDeletedEvent(UUID id) {
+        var carId = repository.findById(id).orElseThrow().getCarId();
+        producer.sendMessage(new RentalDeletedEvent(carId), "rental-deleted");
     }
 }
