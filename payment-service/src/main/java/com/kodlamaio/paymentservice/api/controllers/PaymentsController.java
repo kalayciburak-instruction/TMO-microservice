@@ -1,5 +1,6 @@
 package com.kodlamaio.paymentservice.api.controllers;
 
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.paymentservice.business.abstacts.PaymentService;
 import com.kodlamaio.paymentservice.business.dto.requests.CreatePaymentRequest;
 import com.kodlamaio.paymentservice.business.dto.requests.UpdatePaymentRequest;
@@ -46,5 +47,10 @@ public class PaymentsController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable UUID id) {
         service.delete(id);
+    }
+
+    @PostMapping("/check")
+    public void proccessPayment(@RequestBody CreateRentalPaymentRequest request) {
+        service.processPayment(request);
     }
 }

@@ -15,7 +15,7 @@ public class UpdatePaymentRequest {
     @Size(min = 16, max = 16, message = "Card number must be 16 charachters long")
     private String cardNumber;
     @NotBlank(message = "card holder is required")
-    private String cardHoldeR;
+    private String cardHolder;
     @Min(value = 2023, message = "Card expiration year must be at least current year")
     private int cardExpirationYear;
     @Min(value = 1, message = "Card expiration month must be between 1 and 12")

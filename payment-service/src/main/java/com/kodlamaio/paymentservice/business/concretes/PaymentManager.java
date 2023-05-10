@@ -1,7 +1,9 @@
 package com.kodlamaio.paymentservice.business.concretes;
 
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.paymentservice.business.abstacts.PaymentService;
+import com.kodlamaio.paymentservice.business.abstacts.PosService;
 import com.kodlamaio.paymentservice.business.dto.requests.CreatePaymentRequest;
 import com.kodlamaio.paymentservice.business.dto.requests.UpdatePaymentRequest;
 import com.kodlamaio.paymentservice.business.dto.responses.CreatePaymentResponse;
@@ -23,6 +25,7 @@ public class PaymentManager implements PaymentService {
     private final PaymentRepository repository;
     private final ModelMapperService mapper;
     private final PaymentBusinessRules rules;
+    private final PosService posService;
 
     @Override
     public List<GetAllPaymentsResponse> getAll() {
@@ -46,6 +49,7 @@ public class PaymentManager implements PaymentService {
 
     @Override
     public CreatePaymentResponse add(CreatePaymentRequest request) {
+        rules.checkIfCardNumberExists(request.getCardNumber());
         var brand = mapper.forRequest().map(request, Payment.class);
         var createdPayment = repository.save(brand);
         var response = mapper.forResponse().map(createdPayment, CreatePaymentResponse.class);
@@ -68,5 +72,16 @@ public class PaymentManager implements PaymentService {
     public void delete(UUID id) {
         rules.checkIfPaymentExists(id);
         repository.deleteById(id);
+    }
+
+    @Override
+    public void processPayment(CreateRentalPaymentRequest request) {
+        rules.checkIfPaymentValid(request);
+        var payment = repository.findByCardNumber(request.getCardNumber());
+        double balance = payment.getBalance();
+        rules.checkIfBalanceIsEnough(balance, request.getPrice());
+        posService.pay();
+        payment.setBalance(balance - request.getPrice());
+        repository.save(payment);
     }
 }

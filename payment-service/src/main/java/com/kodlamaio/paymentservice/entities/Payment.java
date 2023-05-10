@@ -21,7 +21,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private String cardNumber;
-    private String cardHoldeR;
+    private String cardHolder;
     private int cardExpirationYear;
     private int cardExpirationMonth;
     private String cardCvv;

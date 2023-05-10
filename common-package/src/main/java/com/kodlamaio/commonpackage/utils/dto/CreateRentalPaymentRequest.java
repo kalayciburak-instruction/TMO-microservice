@@ -1,4 +1,4 @@
-package com.kodlamaio.paymentservice.business.dto.requests;
+package com.kodlamaio.commonpackage.utils.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreatePaymentRequest {
+public class CreateRentalPaymentRequest {
     @NotEmpty(message = "Card number is required")
     @Size(min = 16, max = 16, message = "Card number must be 16 charachters long")
     private String cardNumber;
@@ -25,6 +25,5 @@ public class CreatePaymentRequest {
     @Size(min = 3, max = 3, message = "Card CVV must be 3 characthers long")
     private String cardCvv;
     @Min(value = 1, message = "Balance must be at least 1")
-    private double balance;
+    private double price;
 }
-

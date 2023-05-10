@@ -3,6 +3,8 @@ package com.kodlamaio.inventoryservice.business.concretes;
 import com.kodlamaio.commonpackage.events.Inventory.CarCreatedEvent;
 import com.kodlamaio.commonpackage.events.Inventory.CarDeletedEvent;
 import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
+import com.kodlamaio.commonpackage.utils.dto.CarClientResponse;
+import com.kodlamaio.commonpackage.utils.exceptions.BusinessException;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
 import com.kodlamaio.inventoryservice.business.dto.requests.create.CreateCarRequest;
@@ -81,9 +83,10 @@ public class CarManager implements CarService {
     }
 
     @Override
-    public void checkIfCarAvailable(UUID id) {
-        rules.checkIfCarExists(id);
-        rules.checkCarAvailability(id);
+    public CarClientResponse checkIfCarAvailable(UUID id) {
+        var response = new CarClientResponse();
+        validateCarAvailability(id, response);
+        return response;
     }
 
     @Override
@@ -100,5 +103,16 @@ public class CarManager implements CarService {
         var event = new CarDeletedEvent();
         event.setCarId(carId);
         producer.sendMessage(event, "car-deleted");
+    }
+
+    private void validateCarAvailability(UUID id, CarClientResponse response) {
+        try {
+            rules.checkIfCarExists(id);
+            rules.checkCarAvailability(id);
+            response.setSuccess(true);
+        } catch (BusinessException exception) {
+            response.setSuccess(false);
+            response.setMessage(exception.getMessage());
+        }
     }
 }

@@ -3,8 +3,9 @@ package com.kodlamaio.rentalservice.bvsiness.business;
 import com.kodlamaio.commonpackage.events.rental.RentalCreatedEvent;
 import com.kodlamaio.commonpackage.events.rental.RentalDeletedEvent;
 import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
-import com.kodlamaio.rentalservice.api.client.CarClient;
+import com.kodlamaio.rentalservice.api.client.PaymentClient;
 import com.kodlamaio.rentalservice.bvsiness.abstracts.RentalService;
 import com.kodlamaio.rentalservice.bvsiness.dto.requests.CreateRentalRequest;
 import com.kodlamaio.rentalservice.bvsiness.dto.requests.UpdateRentalRequest;
@@ -28,7 +29,7 @@ public class RentalManager implements RentalService {
     private final RentalRepository repository;
     private final ModelMapperService mapper;
     private final RentalBusinessrules rules;
-    private final CarClient client;
+    private final PaymentClient paymentClient;
     private final KafkaProducer producer;
 
     @Override
@@ -53,11 +54,17 @@ public class RentalManager implements RentalService {
 
     @Override
     public CreateRentalResponse add(CreateRentalRequest request) {
-        client.checkIfCarAvailable(request.getCarId());
+        rules.ensureCarIsAvailable(request.getCarId());
         var rental = mapper.forRequest().map(request, Rental.class);
         rental.setId(null);
         rental.setTotalPrice(getTotalPrice(rental));
         rental.setRentedAt(LocalDate.now());
+
+        var paymentRequest = new CreateRentalPaymentRequest();
+        mapper.forRequest().map(request.getInfo(), paymentRequest);
+        paymentRequest.setPrice(getTotalPrice(rental));
+        paymentClient.proccessPayment(paymentRequest);
+
         repository.save(rental);
         sendKafkaRentalCreatedEvent(request.getCarId());
         var response = mapper.forResponse().map(rental, CreateRentalResponse.class);

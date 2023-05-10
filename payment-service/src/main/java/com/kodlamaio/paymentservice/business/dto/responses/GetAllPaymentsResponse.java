@@ -14,7 +14,7 @@ import java.util.UUID;
 public class GetAllPaymentsResponse {
     private UUID id;
     private String cardNumber;
-    private String cardHoldeR;
+    private String cardHolder;
     private int cardExpirationYear;
     private int cardExpirationMonth;
     private String cardCvv;

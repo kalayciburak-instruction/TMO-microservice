@@ -11,6 +11,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
   kafka:
     producer:
       bootstrap-servers: http://192.168.4.24:9092
