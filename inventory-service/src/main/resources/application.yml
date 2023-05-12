@@ -1,6 +1,11 @@
 spring:
   application:
     name: inventory-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://192.168.4.24:8080/auth/realms/RentACarMicroservice/protocol/openid-connect/certs
   datasource:
     username: postgres
     password: '12345'
@@ -33,7 +38,7 @@ eureka:
     service-url:
       defaultZone: http://localhost:9000/eureka
   instance:
-    instance-id: ${spring.application.name}:${instanceId:${random.value}}
+    instance-id: ${spring.application.name}:${random.value}
     preferIpAddress: true
 server:
   port: 0

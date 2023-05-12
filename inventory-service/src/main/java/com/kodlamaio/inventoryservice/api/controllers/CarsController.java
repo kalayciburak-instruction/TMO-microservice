@@ -11,6 +11,8 @@ import com.kodlamaio.inventoryservice.business.dto.responses.update.UpdateCarRes
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public class CarsController {
     private final CarService service;
 
     @GetMapping
-    public List<GetAllCarsResponse> getAll() {
+    public List<GetAllCarsResponse> getAll(@AuthenticationPrincipal Jwt jwt) {
         return service.getAll();
     }
 

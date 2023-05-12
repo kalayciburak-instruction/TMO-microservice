@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface RentalService {
     List<GetAllRentalsResponse> getAll();
     GetRentalResponse getById(UUID id);
-    CreateRentalResponse add(CreateRentalRequest request);
+    CreateRentalResponse add(CreateRentalRequest request, UUID customerId);
     UpdateRentalResponse update(UUID id, UpdateRentalRequest request);
     void delete(UUID id);
 }

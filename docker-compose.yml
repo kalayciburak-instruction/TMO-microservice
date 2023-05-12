@@ -19,6 +19,48 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:legacy
+    container_name: keycloak-tmo
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+    # KEYCLOAK_IMPORT: realm-export.json
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/opt/jboss/keycloak/imports
+
+#  keycloak:
+#    image: quay.io/keycloak/keycloak:legacy
+#    container_name: keycloak-postgres
+#    environment:
+#      - KEYCLOAK_USER=admin
+#      - KEYCLOAK_PASSWORD=admin
+#      - DB_VENDOR=POSTGRES
+#      - DB_ADDR=keycloakpostgres
+#      - DB_PORT=5432
+#      - DB_DATABASE=keycloak
+#      - DB_USER=postgres
+#      - DB_PASSWORD=12345
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - keycloakpostgres
+#
+#  keycloakpostgres:
+#    image: postgres
+#    container_name: postgres-keycloak
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    environment:
+#      - POSTGRES_DB=keycloak
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=12345
+#    ports:
+#      - "5438:5432"
+
 volumes:
   kafka_data:
   mongodb_data:
+#  postgres_data:
