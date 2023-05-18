@@ -1,6 +1,8 @@
 package com.kodlamaio.paymentservice.business.concretes;
 
+import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
+import com.kodlamaio.commonpackage.utils.exceptions.BusinessException;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.paymentservice.business.abstacts.PaymentService;
 import com.kodlamaio.paymentservice.business.abstacts.PosService;
@@ -75,13 +77,26 @@ public class PaymentManager implements PaymentService {
     }
 
     @Override
-    public void processPayment(CreateRentalPaymentRequest request) {
-        rules.checkIfPaymentValid(request);
-        var payment = repository.findByCardNumber(request.getCardNumber());
-        double balance = payment.getBalance();
-        rules.checkIfBalanceIsEnough(balance, request.getPrice());
-        posService.pay();
-        payment.setBalance(balance - request.getPrice());
-        repository.save(payment);
+    public ClientResponse processPayment(CreateRentalPaymentRequest request) {
+        var response = new ClientResponse();
+        processPaymentTransaction(request, response);
+
+        return response;
+    }
+
+    private void processPaymentTransaction(CreateRentalPaymentRequest request, ClientResponse response) {
+        try {
+            rules.checkIfPaymentValid(request);
+            var payment = repository.findByCardNumber(request.getCardNumber());
+            double balance = payment.getBalance();
+            rules.checkIfBalanceIsEnough(balance, request.getPrice());
+            posService.pay();
+            payment.setBalance(balance - request.getPrice());
+            repository.save(payment);
+            response.setSuccess(true);
+        } catch (BusinessException exception) {
+            response.setSuccess(false);
+            response.setMessage(exception.getMessage());
+        }
     }
 }

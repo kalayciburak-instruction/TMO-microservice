@@ -12,3 +12,13 @@ eureka:
   instance:
     hostname: discovery-server
 
+management:
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CarClientResponse {
+public class ClientResponse {
     private boolean isSuccess;
     private String message;
 }

@@ -6,6 +6,7 @@ import com.kodlamaio.rentalservice.bvsiness.dto.responses.CreateRentalResponse;
 import com.kodlamaio.rentalservice.bvsiness.dto.responses.GetAllRentalsResponse;
 import com.kodlamaio.rentalservice.bvsiness.dto.responses.GetRentalResponse;
 import com.kodlamaio.rentalservice.bvsiness.dto.responses.UpdateRentalResponse;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +14,7 @@ import java.util.UUID;
 public interface RentalService {
     List<GetAllRentalsResponse> getAll();
     GetRentalResponse getById(UUID id);
-    CreateRentalResponse add(CreateRentalRequest request, UUID customerId);
+    CreateRentalResponse add(CreateRentalRequest request, Jwt jwt);
     UpdateRentalResponse update(UUID id, UpdateRentalRequest request);
     void delete(UUID id);
 }

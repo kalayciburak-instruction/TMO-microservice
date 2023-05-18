@@ -25,42 +25,50 @@ services:
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
-    # KEYCLOAK_IMPORT: realm-export.json
+    #      KEYCLOAK_IMPORT: realm-export.json
     ports:
       - "8080:8080"
     volumes:
       - .:/opt/jboss/keycloak/imports
 
-#  keycloak:
-#    image: quay.io/keycloak/keycloak:legacy
-#    container_name: keycloak-postgres
-#    environment:
-#      - KEYCLOAK_USER=admin
-#      - KEYCLOAK_PASSWORD=admin
-#      - DB_VENDOR=POSTGRES
-#      - DB_ADDR=keycloakpostgres
-#      - DB_PORT=5432
-#      - DB_DATABASE=keycloak
-#      - DB_USER=postgres
-#      - DB_PASSWORD=12345
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      - keycloakpostgres
-#
-#  keycloakpostgres:
-#    image: postgres
-#    container_name: postgres-keycloak
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
-#    environment:
-#      - POSTGRES_DB=keycloak
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_PASSWORD=12345
-#    ports:
-#      - "5438:5432"
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitor-net
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - grafana-config:/etc/grafana
+    networks:
+      - monitor-net
 
 volumes:
   kafka_data:
   mongodb_data:
-#  postgres_data:
+  grafana-data:
+    driver: local
+  grafana-config:
+    driver: local
+
+networks:
+  monitor-net:
+    driver: bridge

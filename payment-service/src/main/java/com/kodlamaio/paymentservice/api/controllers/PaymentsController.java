@@ -1,5 +1,6 @@
 package com.kodlamaio.paymentservice.api.controllers;
 
+import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.paymentservice.business.abstacts.PaymentService;
 import com.kodlamaio.paymentservice.business.dto.requests.CreatePaymentRequest;
@@ -50,7 +51,7 @@ public class PaymentsController {
     }
 
     @PostMapping("/check")
-    public void proccessPayment(@RequestBody CreateRentalPaymentRequest request) {
-        service.processPayment(request);
+    public ClientResponse proccessPayment(@RequestBody CreateRentalPaymentRequest request) {
+        return service.processPayment(request);
     }
 }
