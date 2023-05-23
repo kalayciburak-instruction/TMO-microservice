@@ -11,24 +11,24 @@ scrape_configs:
     scrape_interval: 2s
     metrics_path: '/filter-service/actuator/prometheus'
     static_configs:
-      - targets: [ '192.168.4.11:9010' ]
+      - targets: [ 'api-gateway:9010' ]
   - job_name: 'inventory-service'
     scrape_interval: 2s
     metrics_path: '/inventory-service/actuator/prometheus'
     static_configs:
-      - targets: [ '192.168.4.11:9010' ]
+      - targets: [ 'api-gateway:9010' ]
   - job_name: 'customer-service'
     scrape_interval: 2s
     metrics_path: '/customer-service/actuator/prometheus'
     static_configs:
-      - targets: [ '192.168.4.11:9010' ]
+      - targets: [ 'api-gateway:9010' ]
   - job_name: 'payment-service'
     scrape_interval: 2s
     metrics_path: '/payment-service/actuator/prometheus'
     static_configs:
-      - targets: [ '192.168.4.11:9010' ]
+      - targets: [ 'api-gateway:9010' ]
   - job_name: 'rental-service'
     scrape_interval: 2s
     metrics_path: '/rental-service/actuator/prometheus'
     static_configs:
-      - targets: [ '192.168.4.11:9010' ]
+      - targets: [ 'api-gateway:9010' ]

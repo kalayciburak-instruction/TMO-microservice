@@ -1,53 +1,8 @@
 spring:
-  main:
-    allow-bean-definition-overriding: true
   application:
     name: filter-service
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://192.168.4.24:8080/auth/realms/RentACarMicroservice/protocol/openid-connect/certs
-  data:
-    mongodb:
-      database: filter-db-dev
-      uri: mongodb://192.168.4.24:27017
-  kafka:
-    consumer:
-      auto-offset-reset: earliest
-      bootstrap-servers: 192.168.4.24:9092
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      properties:
-        spring:
-          json:
-            trusted:
-              packages: "*"
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-eureka:
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://localhost:9000/eureka
-  instance:
-    instance-id: ${spring.application.name}:${random.value}
-    preferIpAddress: true
-server:
-  port: 0
-
-management:
-  endpoint:
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  tracing:
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://192.168.4.24:9411/api/v2/spans
+  cloud:
+    config:
+      profile: prod
+  config:
+    import: configserver:http://config-server:8888

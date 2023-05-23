@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   kafka:
@@ -9,23 +9,14 @@ services:
     volumes:
       - kafka_data:/opt/kafka/kafka-logs
     environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.4.24:9092
-
-  mongodb:
-    container_name: filterdb-dev
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
 
   keycloak:
     image: quay.io/keycloak/keycloak:legacy
     container_name: keycloak-tmo
     environment:
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
-    #      KEYCLOAK_IMPORT: realm-export.json
+      KEYCLOAK_USER: tmo
+      KEYCLOAK_PASSWORD: 12345
     ports:
       - "8080:8080"
     volumes:
@@ -61,12 +52,199 @@ services:
     networks:
       - monitor-net
 
+  configserver:
+    build: ./config-server
+    container_name: config-server
+    image: config-server-image
+    ports:
+      - "8888:8888"
+    volumes:
+      - /app
+    environment:
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=https://github.com/kalayciburak-instruction/TMO-config-server
+
+  discoveryserver:
+    build: ./discovery-server
+    container_name: discovery-server
+    image: discovery-server-image
+    ports:
+      - "8761:8761"
+    volumes:
+      - ./discovery-server:/app
+    depends_on:
+      - configserver
+
+  apigateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    image: api-gateway-image
+    ports:
+      - "9010:9010"
+    volumes:
+      - ./api-gateway:/app
+    depends_on:
+      - zipkin
+      - configserver
+      - discoveryserver
+
+  filterservice:
+    build: ./filter-service
+    container_name: filter-service
+    image: filter-service-image
+    volumes:
+      - ./filter-service:/app
+    depends_on:
+      - configserver
+      - filterdb
+    environment:
+      - SPRING_CLOUD_CONFIG_IMPORT=configserver:http://configserver:8888
+      - SPRING_DATA_MONGODB_URI=mongodb://filterdb:27017/filterdb
+
+  customerservice:
+    build: ./customer-service
+    container_name: customer-service
+    image: customer-service-image
+    volumes:
+      - ./customer-service:/app
+    depends_on:
+      - keycloak
+      - zipkin
+      - configserver
+      - discoveryserver
+      - customerdb
+    environment:
+      - SPRING_CLOUD_CONFIG_IMPORT=configserver:http://configserver:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://customerdb:3301/customerdb?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=12345
+  
+  inventoryservice:
+    build: ./inventory-service
+    container_name: inventory-service
+    image: inventory-service-image
+    volumes:
+      - ./inventory-service:/app
+    depends_on:
+      - keycloak
+      - zipkin
+      - configserver
+      - discoveryserver
+      - inventorydb
+    environment:
+      - SPRING_CLOUD_CONFIG_IMPORT=configserver:http://configserver:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://inventorydb:3302/inventorydb?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=12345
+  
+  paymentservice:
+    build: ./payment-service
+    container_name: payment-service
+    image: payment-service-image
+    volumes:
+      - ./payment-service:/app
+    depends_on:
+      - keycloak
+      - zipkin
+      - configserver
+      - discoveryserver
+      - paymentdb
+    environment:
+      - SPRING_CLOUD_CONFIG_IMPORT=configserver:http://configserver:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://paymentdb:3303/paymentdb?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=12345
+
+  rentalservice:
+    build: ./rental-service
+    container_name: rental-service
+    image: rental-service-image
+    volumes:
+      - ./rental-service:/app
+    depends_on:
+      - keycloak
+      - zipkin
+      - configserver
+      - discoveryserver
+      - rentaldb
+    environment:
+      - SPRING_CLOUD_CONFIG_IMPORT=configserver:http://configserver:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://rentaldb:3304/rentaldb?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=12345
+
+  filterdb:
+    container_name: filterdb
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - filterdb:/data/db/
+
+  customerdb:
+    container_name: customerdb
+    image: mysql
+    ports:
+      - "3301:3301"
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_TCP_PORT=3301
+      - VIRTUAL_PORT=3301
+    volumes:
+      - customerdb:/data/db
+
+  inventorydb:
+    container_name: inventorydb
+    image: mysql
+    ports:
+      - "3302:3302"
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_TCP_PORT=3302
+      - VIRTUAL_PORT=3302
+    volumes:
+      - inventorydb:/data/db
+  
+  paymentdb:
+    container_name: paymentdb
+    image: mysql
+    ports:
+      - "3303:3303"
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_TCP_PORT=3303
+      - VIRTUAL_PORT=3303
+    volumes:
+      - paymentdb:/data/db
+
+  rentaldb:
+    container_name: rentaldb
+    image: mysql
+    ports:
+      - "3304:3304"
+    environment:
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_TCP_PORT=3304
+      - VIRTUAL_PORT=3304
+    volumes:
+      - rentaldb:/data/db
+
+
 volumes:
   kafka_data:
-  mongodb_data:
+    driver: local
   grafana-data:
     driver: local
   grafana-config:
+    driver: local
+  filterdb:
+    driver: local
+  inventorydb:
+    driver: local
+  customerdb:
+    driver: local
+  paymentdb:
+    driver: local
+  rentaldb:
     driver: local
 
 networks:

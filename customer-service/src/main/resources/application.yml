@@ -1,46 +1,8 @@
 spring:
   application:
     name: customer-service
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://192.168.4.24:8080/auth/realms/RentACarMicroservice/protocol/openid-connect/certs
-  datasource:
-    username: postgres
-    password: '12345'
-    url: jdbc:postgresql://localhost:5432/customerdb-dev
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-eureka:
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://localhost:9000/eureka
-  instance:
-    instance-id: ${spring.application.name}:${random.value}
-    preferIpAddress: true
-server:
-  port: 0
-
-management:
-  endpoint:
-    metrics:
-      enabled: true
-    prometheus:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  tracing:
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://192.168.4.24:9411/api/v2/spans
+  cloud:
+    config:
+      profile: prod
+  config:
+    import: configserver:http://config-server:8888

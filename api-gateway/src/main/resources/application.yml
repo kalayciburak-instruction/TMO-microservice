@@ -3,9 +3,6 @@ spring:
     name: api-gateway
   cloud:
     config:
-      uri: http://localhost:8888
       profile: prod
   config:
-    import: configserver:http://localhost:8888
-
-
+    import: configserver:http://config-server:8888

@@ -48,8 +48,8 @@ public class ModelManager implements ModelService {
     public CreateModelResponse add(CreateModelRequest request) {
         var model = mapper.forRequest().map(request, Model.class);
         model.setId(UUID.randomUUID());
-        repository.save(model);
-        var response = mapper.forResponse().map(model, CreateModelResponse.class);
+        var createdModel = repository.save(model);
+        var response = mapper.forResponse().map(createdModel, CreateModelResponse.class);
 
         return response;
     }
